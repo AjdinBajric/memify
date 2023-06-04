@@ -9,7 +9,10 @@
         :xl="{}"
         :xxl="{}"
       >
-        <span><img src="" alt="logo" /> Memify</span>
+        <span
+          style="font-family: 'Righteous'; font-size: 40px; line-height: 130%"
+          ><img src="../assets/logo.png" alt="logo" /> Memify</span
+        >
       </Col>
       <Col
         :xs="{ span: 0 }"
@@ -24,10 +27,10 @@
           <li><a href="#">Generate meme</a></li>
           <li><a href="#">Contact us</a></li>
           <li style="display: inline-block">
-            <Button type="primary">Login</Button>
+            <Button type="primary" class="custom-button">Login</Button>
           </li>
           <li style="display: inline-block">
-            <Button type="default">Sign up</Button>
+            <Button type="default" class="outlined-button">Sign up</Button>
           </li>
         </ul>
       </Col>
@@ -84,5 +87,27 @@ ul {
   width: 150px;
   display: inline-block;
   margin-right: 3rem;
+}
+
+.custom-button {
+  float: "left";
+  color: white;
+  background-color: var(--primary-color-2);
+}
+
+.custom-button:hover {
+  background-color: var(--primary-color-2);
+  color: white;
+}
+
+.outlined-button {
+  margin-left: 1rem;
+  color: var(--primary-color-2);
+  border-color: var(--primary-color-2);
+}
+
+.outlined-button:hover {
+  color: var(--primary-color-2);
+  border-color: var(--primary-color-2);
 }
 </style>

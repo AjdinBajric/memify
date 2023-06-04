@@ -52,6 +52,7 @@
             <MemeAnalytics
               v-show="showAnalyticsComponent"
               style="margin-bottom: 2rem"
+              :closeAnalyticsFunction="closeAnalytics"
             />
             <MemeCardsGrid :cardsPerRow="3" :showAnalytics="showAnalytics" />
             <Pagination
@@ -121,10 +122,15 @@ export default defineComponent({
       showAnalyticsComponent.value = true;
     };
 
+    const closeAnalytics = () => {
+      showAnalyticsComponent.value = false;
+    };
+
     return {
       showAnalyticsComponent,
       current,
       showAnalytics,
+      closeAnalytics,
     };
   },
   data() {

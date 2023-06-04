@@ -58,6 +58,7 @@
         :likesCount="23.4"
         :viewsCount="92.3"
         :dailyUsesCount="12"
+        :closeAnalyticsFunction="closeAnalyticsFunction"
       />
     </Col>
   </Row>
@@ -80,6 +81,7 @@ export default {
       default: 3,
     },
     showAnalytics: Function,
+    closeAnalyticsFunction: Function,
   },
   data() {
     return {
