@@ -54,6 +54,7 @@
             html-type="submit"
             style="width: 100%"
             class="custom-button"
+            @click="redirectToMemeGenerator"
           >
             Log in</Button
           >
@@ -93,6 +94,8 @@ import {
   InputPassword,
   Button,
 } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
 export default {
   name: "SignupPage",
   components: {
@@ -103,6 +106,17 @@ export default {
     Input,
     InputPassword,
     Button,
+  },
+  setup() {
+    const router = useRouter();
+
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+
+    return {
+      redirectToMemeGenerator,
+    };
   },
 };
 </script>
