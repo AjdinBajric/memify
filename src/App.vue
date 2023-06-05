@@ -57,9 +57,11 @@ export default {
 
     const redirectToMemeGenerator = () => {
       router.push("/memegenerator");
+      visible.value = false;
     };
     const redirectToHome = () => {
       router.push("/");
+      visible.value = false;
     };
 
     return {
