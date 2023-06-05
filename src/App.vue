@@ -8,9 +8,11 @@
       @close="onClose"
     >
       <Divider type="horizontal" class="divider" />
-      <a href="#" class="hamburger-link">Home</a>
+      <a href="#" class="hamburger-link" @click="redirectToHome">Home</a>
       <Divider type="horizontal" class="divider" />
-      <a href="#" class="hamburger-link">Generate meme</a>
+      <a href="#" class="hamburger-link" @click="redirectToMemeGenerator"
+        >Generate meme</a
+      >
       <Divider type="horizontal" class="divider" />
 
       <a href="#" class="hamburger-link">Contact us</a>
@@ -36,6 +38,7 @@
 import { Drawer, Divider, Avatar } from "ant-design-vue";
 import { ref, provide } from "vue";
 import { UserOutlined } from "@ant-design/icons-vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "App",
@@ -49,10 +52,22 @@ export default {
     const onClose = () => {
       visible.value = false;
     };
+
+    const router = useRouter();
+
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+    const redirectToHome = () => {
+      router.push("/");
+    };
+
     return {
       visible,
       showDrawer,
       onClose,
+      redirectToMemeGenerator,
+      redirectToHome,
     };
   },
 };
