@@ -2,22 +2,25 @@
   <div>
     <Row type="flex" style="padding-top: 1.5rem">
       <Col
-        :xs="12"
-        :sm="12"
-        :md="0"
+        :xs="{ span: 12, offset: 2 }"
+        :sm="{ span: 12, offset: 2 }"
+        :md="{ span: 8, offset: 2 }"
         :lg="{ span: 4, offset: 3 }"
         :xl="{}"
         :xxl="{}"
       >
         <span
-          style="font-family: 'Righteous'; font-size: 40px; line-height: 130%"
-          ><img src="../assets/logo.png" alt="logo" /> Memify</span
+          style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%"
+          ><img src="../assets/logo.png" alt="logo" style="width: 1.8rem" />
+          Memify</span
         >
       </Col>
-      <Col :xs="0" :sm="0" :md="24" :lg="14" :xl="{}" :xxl="{}">
+      <Col :xs="0" :sm="0" :md="12" :lg="14" :xl="{}" :xxl="{}">
         <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Generate meme</a></li>
+          <li><a href="#" @click="redirectToHome">Home</a></li>
+          <li>
+            <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
+          </li>
           <li><a href="#">Contact us</a></li>
           <li style="display: inline-block">
             <Avatar alt="profile picture" style="background-color: purple">
@@ -29,8 +32,8 @@
         </ul>
       </Col>
       <Col
-        :xs="{ span: 12 }"
-        :sm="{ span: 12 }"
+        :xs="{ span: 8 }"
+        :sm="{ span: 8 }"
         :md="{ span: 0 }"
         :lg="{ span: 0 }"
         :xl="{}"
@@ -44,7 +47,7 @@
         />
       </Col>
       <Col
-        :xs="{ span: 1 }"
+        :xs="{ span: 3 }"
         :sm="{ span: 1 }"
         :md="{ span: 2 }"
         :lg="{ span: 3 }"
@@ -60,6 +63,7 @@
 import { Row, Col, Avatar } from "ant-design-vue";
 import { UserOutlined } from "@ant-design/icons-vue";
 import { ref, inject } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "SignedInHeader",
@@ -76,14 +80,24 @@ export default {
 
     const handleResize = () => {
       isMobileOrTablet.value = window.innerWidth <= 768; // Adjust the breakpoint as needed
-      console.log(isMobileOrTablet.value);
     };
 
     window.addEventListener("resize", handleResize);
 
+    const router = useRouter();
+
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+    const redirectToHome = () => {
+      router.push("/");
+    };
+
     return {
       isMobileOrTablet,
       showDrawer,
+      redirectToMemeGenerator,
+      redirectToHome,
     };
   },
   mounted() {
@@ -115,6 +129,7 @@ a {
 ul {
   padding: 0;
   text-align: right;
+  margin-top: 0;
 }
 
 .stats-card {
@@ -124,5 +139,6 @@ ul {
 }
 .hamburger-menu {
   float: right;
+  width: 2.2rem;
 }
 </style>

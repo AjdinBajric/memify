@@ -83,6 +83,7 @@
             color: var(--primary-color);
             text-decoration: underline !important;
           "
+          @click="redirectToLogin"
           >Login</a
         >
       </p>
@@ -112,6 +113,8 @@ import {
   Select,
   Button,
 } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
 export default {
   name: "LoginPage",
   components: {
@@ -124,6 +127,17 @@ export default {
     InputPassword,
     Select,
     Button,
+  },
+  setup() {
+    const router = useRouter();
+
+    const redirectToLogin = () => {
+      router.push("/login");
+    };
+
+    return {
+      redirectToLogin,
+    };
   },
 };
 </script>

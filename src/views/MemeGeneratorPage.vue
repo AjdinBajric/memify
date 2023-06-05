@@ -11,7 +11,13 @@
         :xxl="{}"
       >
         <Layout
-          style="padding: 24px 0; background: transparent; min-height: 80vh"
+          style="
+            padding: 12px 0px 0px 0px;
+            background: white;
+            min-height: 80vh;
+            margin-top: 2rem;
+            border-radius: 16px;
+          "
         >
           <LayoutSider
             width="200"
@@ -33,13 +39,13 @@
                 Dashboard
               </h1>
               <Menu mode="inline" style="height: 100%">
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToMemeGenerator"
                   ><img
                     src="../assets/nature.png"
                     alt="img1"
                   />Generator</MenuItem
                 >
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToSavedMemes"
                   ><img
                     src="../assets/bookmark.png"
                     alt="img2"
@@ -51,7 +57,7 @@
                     alt="img3"
                   />Settings</MenuItem
                 >
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToHome"
                   ><img src="../assets/logout.png" alt="img4" />Home</MenuItem
                 >
               </Menu>
@@ -134,6 +140,7 @@ import SignedInHeader from "@/components/SignedInHeader.vue";
 import MemeCardsGrid from "@/components/MemeCardsGrid.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import MemeGeneratorForm from "@/components/MemeGeneratorForm.vue";
+import { useRouter } from "vue-router";
 
 import {
   Row,
@@ -189,6 +196,25 @@ export default {
         }
       }
     },
+  },
+  setup() {
+    const router = useRouter();
+
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+    const redirectToSavedMemes = () => {
+      router.push("/savedmemes");
+    };
+    const redirectToHome = () => {
+      router.push("/");
+    };
+
+    return {
+      redirectToMemeGenerator,
+      redirectToSavedMemes,
+      redirectToHome,
+    };
   },
 };
 </script>

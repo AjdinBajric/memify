@@ -10,7 +10,14 @@
         :xl="{}"
         :xxl="{}"
       >
-        <Layout style="padding: 24px 0; background: #fff; min-height: 80vh">
+        <Layout
+          style="
+            padding: 24px 0;
+            background: #fff;
+            min-height: 80vh;
+            border-radius: 16px;
+          "
+        >
           <LayoutSider
             width="200"
             style="background: #fff"
@@ -24,13 +31,13 @@
             <div class="sidebar">
               <h1 style="margin-left: 10%">Dashboard</h1>
               <Menu mode="inline" style="height: 100%; border-radius: 16px">
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToMemeGenerator"
                   ><img
                     src="../assets/nature.png"
                     alt="img1"
                   />Generator</MenuItem
                 >
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToSavedMemes"
                   ><img
                     src="../assets/bookmark.png"
                     alt="img2"
@@ -42,7 +49,7 @@
                     alt="img3"
                   />Settings</MenuItem
                 >
-                <MenuItem class="menu-item"
+                <MenuItem class="menu-item" @click="redirectToHome"
                   ><img src="../assets/logout.png" alt="img4" />Home</MenuItem
                 >
               </Menu>
@@ -53,8 +60,9 @@
               v-show="showAnalyticsComponent"
               style="margin-bottom: 2rem"
               :closeAnalyticsFunction="closeAnalytics"
+              id="analytics"
             />
-            <MemeCardsGrid :cardsPerRow="3" :showAnalytics="showAnalytics" />
+            <MemeCardsGrid :cardsPerRow="2" :showAnalytics="showAnalytics" />
             <Pagination
               v-model:current="current"
               :total="50"
@@ -85,7 +93,7 @@ import SignedInHeader from "@/components/SignedInHeader.vue";
 import MemeCardsGrid from "@/components/MemeCardsGrid.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import MemeAnalytics from "@/components/MemeAnalytics.vue";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, nextTick } from "vue";
 
 import {
   Row,
@@ -97,6 +105,8 @@ import {
   LayoutContent,
   Pagination,
 } from "ant-design-vue";
+
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "SavedMemesPage",
@@ -120,10 +130,27 @@ export default defineComponent({
 
     const showAnalytics = () => {
       showAnalyticsComponent.value = true;
+
+      // Use nextTick to wait for DOM update
+      nextTick(() => {
+        const analyticsDiv = document.getElementById("analytics");
+        analyticsDiv.scrollIntoView({ behavior: "smooth" });
+      });
     };
 
     const closeAnalytics = () => {
       showAnalyticsComponent.value = false;
+    };
+    const router = useRouter();
+
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+    const redirectToSavedMemes = () => {
+      router.push("/savedmemes");
+    };
+    const redirectToHome = () => {
+      router.push("/");
     };
 
     return {
@@ -131,6 +158,9 @@ export default defineComponent({
       current,
       showAnalytics,
       closeAnalytics,
+      redirectToMemeGenerator,
+      redirectToSavedMemes,
+      redirectToHome,
     };
   },
   data() {

@@ -1,17 +1,12 @@
 <template>
   <div class="background">
     <LandingHeader style="padding-top: 1.5rem" />
-    <Row
-      style="height: 100vh; margin-top: 20vh"
-      type="flex"
-      justify="center"
-      align="top"
-    >
+    <Row style="height: 100vh; margin: 10ch" type="flex" align="top">
       <Col
         :xs="{ span: 22, offset: 1 }"
         :sm="{ span: 18, offset: 3 }"
-        :md="{ span: 10, offset: 2 }"
-        :lg="{ span: 10, offset: 2 }"
+        :md="{ span: 11, offset: 1 }"
+        :lg="{ span: 11, offset: 1 }"
         :xl="{}"
         :xxl="{}"
       >
@@ -27,7 +22,9 @@
           our user-friendly and feature-packed meme generator app.
         </p>
         <div style="text-align: center">
-          <Button class="custom-button" type="primary">Get Started Now</Button>
+          <Button class="custom-button" type="primary" @click="redirectToLogin"
+            >Get Started Now</Button
+          >
         </div>
       </Col>
       <Col
@@ -69,6 +66,7 @@
 <script>
 import LandingHeader from "@/components/LandingHeader.vue";
 import { Row, Col, Button } from "ant-design-vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "LandingPage",
@@ -77,6 +75,17 @@ export default {
     Row,
     Col,
     Button,
+  },
+  setup() {
+    const router = useRouter();
+
+    const redirectToLogin = () => {
+      router.push("/signup");
+    };
+
+    return {
+      redirectToLogin,
+    };
   },
 };
 </script>
@@ -95,6 +104,7 @@ export default {
     #d9a7c7
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   height: 100vh;
+  overflow-y: hidden;
 }
 
 .title {

@@ -10,8 +10,9 @@
         :xxl="{}"
       >
         <span
-          style="font-family: 'Righteous'; font-size: 40px; line-height: 130%"
-          ><img src="../assets/logo.png" alt="logo" /> Memify</span
+          style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%"
+          ><img src="../assets/logo.png" alt="logo" style="width: 1.9rem" />
+          Memify</span
         >
       </Col>
       <Col
@@ -22,15 +23,27 @@
         :xl="{}"
         :xxl="{}"
       >
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Generate meme</a></li>
+        <ul style="margin-top: 0">
+          <li><a href="#" @click="redirectToHome">Home</a></li>
+          <li>
+            <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
+          </li>
           <li><a href="#">Contact us</a></li>
           <li style="display: inline-block">
-            <Button type="primary" class="custom-button">Login</Button>
+            <Button
+              type="primary"
+              class="custom-button"
+              @click="redirectToLogin"
+              >Login</Button
+            >
           </li>
           <li style="display: inline-block">
-            <Button type="default" class="outlined-button">Sign up</Button>
+            <Button
+              type="default"
+              class="outlined-button"
+              @click="redirectToSignUp"
+              >Sign up</Button
+            >
           </li>
         </ul>
       </Col>
@@ -50,6 +63,7 @@
 
 <script>
 import { Row, Col, Button } from "ant-design-vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "LandingHeader",
@@ -57,6 +71,29 @@ export default {
     Row,
     Col,
     Button,
+  },
+
+  setup() {
+    const router = useRouter();
+
+    const redirectToSignUp = () => {
+      router.push("/signup");
+    };
+    const redirectToLogin = () => {
+      router.push("/login");
+    };
+    const redirectToHome = () => {
+      router.push("/");
+    };
+    const redirectToMemeGenerator = () => {
+      router.push("/memegenerator");
+    };
+    return {
+      redirectToLogin,
+      redirectToSignUp,
+      redirectToHome,
+      redirectToMemeGenerator,
+    };
   },
 };
 </script>

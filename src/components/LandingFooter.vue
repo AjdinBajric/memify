@@ -1,6 +1,7 @@
 <template>
   <div>
     <Row type="flex">
+      <Divider />
       <Col
         :xs="{ span: 21 }"
         :sm="{ span: 12 }"
@@ -192,13 +193,14 @@
 </template>
 
 <script>
-import { Row, Col } from "ant-design-vue";
+import { Row, Col, Divider } from "ant-design-vue";
 
 export default {
   name: "LandingFooter",
   components: {
     Row,
     Col,
+    Divider,
   },
 };
 </script>
