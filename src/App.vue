@@ -8,9 +8,18 @@
       @close="onClose"
     >
       <Divider type="horizontal" class="divider" />
-      <a href="#" class="hamburger-link" @click="redirectToHome">Home</a>
+      <a href="#" class="hamburger-link" @click.prevent="redirectToHome"
+        >Home</a
+      >
       <Divider type="horizontal" class="divider" />
-      <a href="#" class="hamburger-link" @click="redirectToMemeGenerator"
+      <a href="#" class="hamburger-link" @click.prevent="redirectToSavedMemes"
+        >Saved memes</a
+      >
+      <Divider type="horizontal" class="divider" />
+      <a
+        href="#"
+        class="hamburger-link"
+        @click.prevent="redirectToMemeGenerator"
         >Generate meme</a
       >
       <Divider type="horizontal" class="divider" />
@@ -63,6 +72,10 @@ export default {
       router.push("/");
       visible.value = false;
     };
+    const redirectToSavedMemes = () => {
+      router.push("/savedmemes");
+      visible.value = false;
+    };
 
     return {
       visible,
@@ -70,6 +83,7 @@ export default {
       onClose,
       redirectToMemeGenerator,
       redirectToHome,
+      redirectToSavedMemes,
     };
   },
 };
