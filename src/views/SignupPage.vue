@@ -1,20 +1,20 @@
 <template>
   <Row class="background" type="flex" justify="center" align="middle">
     <Col
-      :xs="{ span: 22, offset: 1 }"
-      :sm="{ span: 9, offset: 2 }"
-      :md="{ span: 8, offset: 3 }"
-      :lg="{ span: 7, offset: 4 }"
-      :xl="{ span: 7, offset: 4 }"
-      :xxl="{}"
+        :xs="{ span: 22, offset: 1 }"
+        :sm="{ span: 9, offset: 2 }"
+        :md="{ span: 8, offset: 3 }"
+        :lg="{ span: 7, offset: 4 }"
+        :xl="{ span: 7, offset: 4 }"
+        :xxl="{}"
     >
       <div class="logo-container">
-        <img src="../assets/logo.svg" alt="logo" class="logo" />
+        <img src="../assets/logo.svg" alt="logo" class="logo"/>
       </div>
       <h1 class="title">
-        Welcome To Memify<br />
+        Welcome To Memify<br/>
         <span class="subtitle"
-          >Where Humor Takes <br />
+        >Where Humor Takes <br/>
           Shape!</span
         >
       </h1>
@@ -24,77 +24,78 @@
       </p>
     </Col>
     <Col
-      :xs="{ span: 1 }"
-      :sm="{ span: 0 }"
-      :md="{ span: 0 }"
-      :lg="{ span: 0 }"
-      :xl="{ span: 0 }"
-      :xxl="{}"
+        :xs="{ span: 1 }"
+        :sm="{ span: 0 }"
+        :md="{ span: 0 }"
+        :lg="{ span: 0 }"
+        :xl="{ span: 0 }"
+        :xxl="{}"
     >
     </Col>
     <Col
-      :xs="{ span: 22, offset: 1 }"
-      :sm="{ span: 9, offset: 1 }"
-      :md="{ span: 8, offset: 2 }"
-      :lg="{ span: 7, offset: 2 }"
-      :xl="{ span: 7, offset: 2 }"
-      :xxl="{}"
+        :xs="{ span: 22, offset: 1 }"
+        :sm="{ span: 9, offset: 1 }"
+        :md="{ span: 8, offset: 2 }"
+        :lg="{ span: 7, offset: 2 }"
+        :xl="{ span: 7, offset: 2 }"
+        :xxl="{}"
     >
       <h1>Let’s get you started</h1>
-      <Form layout="vertical">
+      <Form layout="vertical" @submit="signUp">
         <FormItem label="Full name">
-          <Input placeholder="Ade Tiger" />
+          <Input placeholder="Ade Tiger" v-model:value="name"/>
         </FormItem>
         <FormItem label="Email address">
-          <Input placeholder="yourname@email.com" />
+          <Input placeholder="yourname@email.com" v-model:value="email"/>
         </FormItem>
         <FormItem label="Phone number">
-          <Input placeholder="yourname@email.com" />
+          <Input placeholder="yourname@email.com" v-model:value="phoneNumber"/>
         </FormItem>
-        <FormItem label="Phone number">
-          <Input>
-            <template #addonBefore>
-              <Cascader placeholder="country" style="width: fit-content" />
-            </template>
-          </Input>
-        </FormItem>
+<!--        <FormItem label="Phone number">-->
+<!--          <Input v-model="">-->
+<!--            <template #addonBefore>-->
+<!--              <Cascader placeholder="country" style="width: fit-content"/>-->
+<!--            </template>-->
+<!--          </Input>-->
+<!--        </FormItem>-->
         <FormItem label="Create password">
-          <InputPassword />
+          <InputPassword v-model:value="password"/>
         </FormItem>
         <FormItem label="Location (Optional)">
-          <Select />
+          <Select v-model:value="location"/>
         </FormItem>
         <FormItem>
           <Button
-            type="primary"
-            class="custom-button"
-            html-type="submit"
-            style="width: 100%"
+              type="primary"
+              class="custom-button"
+              html-type="submit"
+              style="width: 100%"
           >
-            Sign up</Button
+            Sign up
+          </Button
           >
         </FormItem>
       </Form>
       <p style="text-align: center; font-family: 'Poppins'">
         Already a user?
         <a
-          href="#"
-          style="
+            href="#"
+            style="
             color: var(--primary-color);
             text-decoration: underline !important;
           "
-          @click="redirectToLogin"
-          >Login</a
+            @click="redirectToLogin"
+        >Login</a
         >
       </p>
     </Col>
     <Col
-      :xs="{ span: 1 }"
-      :sm="{ span: 2 }"
-      :md="{ span: 3 }"
-      :lg="{ span: 4 }"
-      :xl="{ span: 4 }"
-      :xxl="{}"
+        :xs="{ span: 1 }"
+        :sm="{ span: 2 }"
+        :md="{ span: 3 }"
+        :lg="{ span: 4 }"
+        :xl="{ span: 4 }"
+        :xxl="{}"
     >
       <!-- Placeholder -->
     </Col>
@@ -108,12 +109,14 @@ import {
   Form,
   FormItem,
   Input,
-  Cascader,
+  // Cascader,
   InputPassword,
   Select,
   Button,
 } from "ant-design-vue";
-import { useRouter } from "vue-router";
+import {useRouter} from "vue-router";
+import {Auth} from 'aws-amplify';
+
 
 export default {
   name: "LoginPage",
@@ -123,10 +126,45 @@ export default {
     Form,
     FormItem,
     Input,
-    Cascader,
+    // Cascader,
     InputPassword,
     Select,
     Button,
+  },
+
+  data() {
+    return {
+      email: '',
+      password: '',
+      name: '',
+      phoneNumber: '',
+      location: '',
+    };
+  },
+
+  methods: {
+    async signUp() {
+      try {
+        // Call the AWS Cognito signUp API
+        await Auth.signUp({
+          username: this.email,
+          password: this.password,
+          attributes: {
+            email: this.email,
+            name: this.name,
+            phone_number: this.phoneNumber,
+            // location: this.location
+          }
+        });
+
+        // Redirect to a confirmation page or show a success message
+        localStorage.setItem('email', this.email);
+        this.$router.push('/login');
+      } catch (error) {
+        // Handle signup error
+        console.log('Signup error:', error);
+      }
+    },
   },
   setup() {
     const router = useRouter();
@@ -166,6 +204,7 @@ export default {
   font-size: 16px;
   text-align: left;
 }
+
 .logo-container {
   display: flex;
   justify-content: center; /* Horizontally center the logo */
@@ -178,10 +217,11 @@ export default {
 }
 
 .custom-button {
-  float: "left";
+  float: left;
   color: white;
   background-color: var(--primary-color-2);
 }
+
 .custom-button:hover {
   background-color: var(--primary-color-2);
   color: white;

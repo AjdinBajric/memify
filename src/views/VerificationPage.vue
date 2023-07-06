@@ -1,6 +1,7 @@
 <template>
   <Row class="background" type="flex" justify="center" align="middle">
-    <Col :xs="{ span: 22, offset: 1 }" :sm="{ span: 9, offset: 2 }" :md="{ span: 8, offset: 3 }" :lg="{ span: 7, offset: 4 }" :xl="{ span: 7, offset: 4 }" :xxl="{}">
+    <Col :xs="{ span: 22, offset: 1 }" :sm="{ span: 9, offset: 2 }" :md="{ span: 8, offset: 3 }"
+         :lg="{ span: 7, offset: 4 }" :xl="{ span: 7, offset: 4 }" :xxl="{}">
       <div class="logo-container">
         <img src="../assets/logo.svg" alt="logo" class="logo"/>
       </div>
@@ -9,26 +10,22 @@
         <span class="subtitle">Where Humor Takes<br/>Shape!</span>
       </h1>
       <p class="description">
-        Unleash your imagination and create hilarious memes in seconds with our user-friendly and feature-packed meme generator app.
+        Unleash your imagination and create hilarious memes in seconds with our user-friendly and feature-packed meme
+        generator app.
       </p>
     </Col>
     <Col :xs="{ span: 1 }" :sm="{ span: 0 }" :md="{ span: 0 }" :lg="{ span: 0 }" :xl="{ span: 0 }" :xxl="{}"></Col>
-    <Col :xs="{ span: 22, offset: 1 }" :sm="{ span: 9, offset: 1 }" :md="{ span: 8, offset: 2 }" :lg="{ span: 7, offset: 2 }" :xl="{ span: 7, offset: 2 }" :xxl="{}">
-      <h1>Log into your account.</h1>
-      <Form layout="vertical" @submit="login">
-        <FormItem label="Email address">
-          <Input v-model:value="email" placeholder="yourname@example.com"/>
-        </FormItem>
-        <FormItem label="Password">
-          <InputPassword v-model:value="password"/>
+    <Col :xs="{ span: 22, offset: 1 }" :sm="{ span: 9, offset: 1 }" :md="{ span: 8, offset: 2 }"
+         :lg="{ span: 7, offset: 2 }" :xl="{ span: 7, offset: 2 }" :xxl="{}">
+      <h1>Verify your account.</h1>
+      <Form layout="vertical" @submit="verifyAccount">
+        <FormItem label="Verification code">
+          <Input v-model:value="verification_code"/>
         </FormItem>
         <FormItem>
-          <Button type="primary" html-type="submit" style="width: 100%" class="custom-button">Log in</Button>
+          <Button type="primary" html-type="submit" style="width: 100%" class="custom-button">Verify</Button>
         </FormItem>
       </Form>
-      <p style="text-align: center">
-        <a href="#" style="color: var(--primary-color); text-decoration: underline !important;">Forgot password?</a>
-      </p>
     </Col>
     <Col :xs="{ span: 1 }" :sm="{ span: 2 }" :md="{ span: 3 }" :lg="{ span: 4 }" :xl="{ span: 4 }" :xxl="{}">
       <!-- Placeholder -->
@@ -37,44 +34,45 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify';
-import { Row, Col, Form, FormItem, Input, InputPassword, Button } from 'ant-design-vue';
-import { notification } from 'ant-design-vue';
+import {Auth} from 'aws-amplify';
+import {Row, Col, Form, FormItem, Input, Button} from 'ant-design-vue';
+import {notification} from 'ant-design-vue';
 
 export default {
-  name: 'LoginPage',
+  name: 'VerificationPage',
   components: {
     Row,
     Col,
     Form,
     FormItem,
     Input,
-    InputPassword,
     Button,
   },
   data() {
     return {
-      email: '',
-      password: '',
+      verification_code: '',
+      email: localStorage.getItem('email'),
     };
   },
   methods: {
-    async login() {
+    async verifyAccount() {
+
       try {
-        const user = await Auth.signIn(this.email, this.password);
+        await Auth.confirmSignUp(this.email, this.verification_code);
 
         notification.success({
-          message: 'Welcome back',
-          description: `Nice to see you ${user.attributes.name}`,
+          message: 'Account Verified',
+          description: 'Your account has been successfully verified.',
         });
+        localStorage.removeItem('email')
 
-        this.$router.push('/memegenerator');
+        this.$router.push('/login');
       } catch (error) {
         notification.error({
-          message: 'Error',
-          description: `Please check your email and password`,
+          message: 'Verification Error',
+          description: 'Please check the verification code and try again.',
         });
-        console.log('Login error:', error);
+        console.log('Verification error:', error);
       }
     },
   },
