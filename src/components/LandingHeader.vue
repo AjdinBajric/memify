@@ -9,11 +9,10 @@
         :xl="{}"
         :xxl="{}"
       >
-        <span
-          style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%"
-          ><img src="../assets/logo.png" alt="logo" style="width: 1.9rem" />
-          Memify</span
-        >
+        <div style="display: flex; align-items: center; cursor: pointer;" @click="redirectToHome">
+          <img src="../assets/logo.png" alt="logo" style="width: 1.8rem"/>
+          <span style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%; margin-left: 12px;">Memify</span>
+        </div>
       </Col>
       <Col
         :xs="{ span: 0 }"
@@ -24,7 +23,7 @@
         :xxl="{}"
       >
         <ul style="margin-top: 0">
-          <li><a href="#" @click="redirectToHome">Home</a></li>
+          <li><a href="#" @click="redirectToMemes">Browse</a></li>
           <li>
             <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
           </li>
@@ -82,6 +81,9 @@ export default {
     const redirectToLogin = () => {
       router.push("/login");
     };
+    const redirectToMemes = () => {
+      router.push("/memes");
+    };
     const redirectToHome = () => {
       router.push("/");
     };
@@ -92,6 +94,7 @@ export default {
       redirectToLogin,
       redirectToSignUp,
       redirectToHome,
+      redirectToMemes,
       redirectToMemeGenerator,
     };
   },

@@ -7,6 +7,7 @@ import MemeGeneratorPage from './views/MemeGeneratorPage';
 import SavedMemesPage from './views/SavedMemesPage';
 import VerificationPage from "@/views/VerificationPage.vue";
 import {Auth} from "@aws-amplify/auth";
+import MemesView from "@/views/MemesView.vue";
 
 const routes = [
     {
@@ -29,7 +30,11 @@ const routes = [
         name: 'Verify',
         component: VerificationPage
     },
-
+    {
+        path: '/memes',
+        name: 'Memes',
+        component: MemesView,
+    },
     {
         path: '/memegenerator',
         name: 'Meme Generator',

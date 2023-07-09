@@ -59,10 +59,10 @@
             <MemeAnalytics
               v-show="showAnalyticsComponent"
               style="margin-bottom: 2rem"
-              :closeAnalyticsFunction="closeAnalytics"
+              :closeAnalyticsFunction="closeAnalyticsComponent"
               id="analytics"
             />
-            <MemeCardsGrid :cardsPerRow="2" :showAnalytics="showAnalytics" />
+            <MemeCardsGrid :cardsPerRow="2" :showAnalytics="openAnalyticsComponent" />
             <Pagination
               v-model:current="current"
               :total="50"
@@ -82,7 +82,7 @@
         :xl="{}"
         :xxl="{}"
       >
-        <LandingFooter style="margin-top: 7rem" />
+        <LandingFooter />
       </Col>
     </Row>
   </div>
@@ -93,7 +93,6 @@ import SignedInHeader from "@/components/SignedInHeader.vue";
 import MemeCardsGrid from "@/components/MemeCardsGrid.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import MemeAnalytics from "@/components/MemeAnalytics.vue";
-import { defineComponent, ref, nextTick } from "vue";
 
 import {
   Row,
@@ -106,9 +105,8 @@ import {
   Pagination,
 } from "ant-design-vue";
 
-import { useRouter } from "vue-router";
 
-export default defineComponent({
+export default {
   name: "SavedMemesPage",
   components: {
     SignedInHeader,
@@ -124,48 +122,11 @@ export default defineComponent({
     MemeAnalytics,
     Pagination,
   },
-  setup() {
-    const showAnalyticsComponent = ref(false);
-    const current = ref(2);
-
-    const showAnalytics = () => {
-      showAnalyticsComponent.value = true;
-
-      // Use nextTick to wait for DOM update
-      nextTick(() => {
-        const analyticsDiv = document.getElementById("analytics");
-        analyticsDiv.scrollIntoView({ behavior: "smooth" });
-      });
-    };
-
-    const closeAnalytics = () => {
-      showAnalyticsComponent.value = false;
-    };
-    const router = useRouter();
-
-    const redirectToMemeGenerator = () => {
-      router.push("/memegenerator");
-    };
-    const redirectToSavedMemes = () => {
-      router.push("/savedmemes");
-    };
-    const redirectToHome = () => {
-      router.push("/");
-    };
-
-    return {
-      showAnalyticsComponent,
-      current,
-      showAnalytics,
-      closeAnalytics,
-      redirectToMemeGenerator,
-      redirectToSavedMemes,
-      redirectToHome,
-    };
-  },
   data() {
     return {
+      current: 1,
       showSider: true,
+      showAnalyticsComponent: false,
       isMobile: false,
     };
   },
@@ -182,19 +143,32 @@ export default defineComponent({
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    openAnalyticsComponent() {
+      this.showAnalyticsComponent = true;
+    },
+    closeAnalyticsComponent() {
+      this.showAnalyticsComponent = false;
+    },
+    redirectToMemeGenerator() {
+      this.$router.push("/memegenerator");
+    },
+    redirectToSavedMemes() {
+      this.$router.push("/savedmemes")
+    },
+    redirectToHome() {
+      this.$router.push("/")
+    },
+
     handleResize() {
       const isMobile = this.isMobileOrTablet;
       if (isMobile !== this.isMobile) {
         this.isMobile = isMobile;
-        if (isMobile) {
-          this.showSider = false;
-        } else {
-          this.showSider = true;
-        }
+        this.showSider = !isMobile;
       }
     },
   },
-});
+}
+
 </script>
 
 <style scoped>

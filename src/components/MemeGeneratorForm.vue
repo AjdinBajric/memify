@@ -2,14 +2,9 @@
   <div>
     <h1 style="font-family: 'Poppins'">Generate your meme</h1>
     <Form layout="vertical">
-      <FormItem label="Top text" style="font-family: 'Poppins'">
-        <Input placeholder="type something..."/>
-      </FormItem>
-      <FormItem label="Bottom text" style="font-family: 'Poppins'">
-        <Input placeholder="type something..."/>
-      </FormItem>
       <FormItem>
-        <UploadDragger name="file" :multiple="false">
+        <MemeEditor v-if="url" :url="url" :text='textFields' ref="memeEditorChild"/>
+        <UploadDragger v-else name="file" :multiple="false" :before-upload="beforeUpload">
           <p class="ant-upload-drag-icon">
             <img src="../assets/uploadPhoto.png" alt="upload image icon"/>
           </p>
@@ -32,12 +27,26 @@
           </p>
         </UploadDragger>
       </FormItem>
-      <FormItem>
-        <Button class="custom-button" type="primary" html-type="submit"
-        >Generate
+      <FormItem style="margin-top: 50px;" v-if="url">
+        <FormItem v-for="text in textFields" :key="text.id" :label="`Text ${text.id}`" style="margin: 8px 0;">
+          <Row type="flex" align="middle">
+            <Col span="20">
+              <Input v-model:value="text.value"/>
+            </Col>
+            <Col span="4">
+              <DeleteOutlined @click="deleteTextField(text.id)"
+                              style="margin-left: 10px; color: red; font-size: 14px;"/>
+            </Col>
+          </Row>
+        </FormItem>
+        <Button @click="addTextField" style>Add text field</Button>
+      </FormItem>
+      <FormItem  v-if="url">
+        <Button @click="$refs.memeEditorChild.downloadMeme()" class="custom-button" type="primary"
+        >Generate meme
         </Button
         >
-        <Button class="outlined-button" @click="handleSave">Save</Button>
+        <Button class="outlined-button" @click="handleSave">Save as template</Button>
         <span style="float: right">
           <img
               src="../assets/twitter.png"
@@ -61,8 +70,10 @@
 </template>
 
 <script>
-import {Form, Input, FormItem, Button, UploadDragger} from "ant-design-vue";
+import {Form, Input, FormItem, Button, UploadDragger, Row, Col} from "ant-design-vue";
 import {API, Auth} from 'aws-amplify';
+import MemeEditor from "@/components/MemeEditor.vue";
+import {DeleteOutlined} from "@ant-design/icons-vue";
 
 export default {
   name: "MemeGeneratorForm",
@@ -72,11 +83,59 @@ export default {
     FormItem,
     Button,
     UploadDragger,
+    MemeEditor,
+    DeleteOutlined,
+    Row,
+    Col,
   },
   data: function () {
-    return {}
+    return {
+      url: null,
+      textFields: [],
+      fileList: [],
+    }
   },
   methods: {
+    addTextField() {
+      const textFieldId = Math.max(...this.textFields.map(t => t.id), 0) + 1;
+      this.textFields.push({id: textFieldId, 'value': 'Text ' + textFieldId});
+    },
+    deleteTextField(id) {
+      this.textFields = this.textFields.filter(textField => textField.id !== id);
+    },
+    beforeUpload(file) {
+      this.fileList.push(file);
+      console.log(this.fileList);
+      // Handle file upload
+      // this.url = await this.uploadFileToS3(file);
+      // this.url = 'http://www.gravatar.com/avatar/0c7c99dec43bb0062494520e57f0b9ae?s=256&d=identicon&r=PG';
+      this.url = 'https://imgflip.com/s/meme/Left-Exit-12-Off-Ramp.jpg';
+      return false;
+    },
+    //   async uploadFileToS3(file) {
+    //   // Initialize AWS with the configuration
+    //   AWS.config.update(this.awsConfig);
+    //
+    //   // Create an S3 instance
+    //   const s3 = new AWS.S3();
+    //
+    //   // Set the upload parameters
+    //   const params = {
+    //     Bucket: this.bucketName,
+    //     Key: this.bucketKey,
+    //     Body: file,
+    //   };
+    //
+    //   // Upload the file to S3
+    //   s3.upload(params, (err, data) => {
+    //     if (err) {
+    //       console.error('Error uploading file:', err);
+    //     } else {
+    //       console.log('File uploaded successfully:', data.Location);
+    //       // Perform any further actions after successful upload
+    //     }
+    //   });
+    // },
     async handleSubmit(e) {
       e.preventDefault();
       // Handle form submission (generate meme)

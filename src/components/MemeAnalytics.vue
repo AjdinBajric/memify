@@ -85,14 +85,15 @@ export default {
     CloseOutlined,
   },
   props: {
-    closeAnalyticsFunction: {
-      type: Function,
-      required: true,
-    },
+    // closeAnalyticsFunction: {
+    //   type: Function,
+    //   required: true,
+    // },
   },
   methods: {
     closeAnalytics() {
-      this.closeAnalyticsFunction();
+      this.$emit("closeAnalytics");
+      // this.closeAnalyticsFunction();
     },
   },
 };

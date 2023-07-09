@@ -9,15 +9,14 @@
           :xl="{}"
           :xxl="{}"
       >
-        <span
-            style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%"
-        ><img src="../assets/logo.png" alt="logo" style="width: 1.8rem"/>
-          Memify</span
-        >
+        <div style="display: flex; align-items: center; cursor: pointer;" @click="redirectToHome">
+          <img src="../assets/logo.png" alt="logo" style="width: 1.8rem"/>
+          <span style="font-family: 'Righteous'; font-size: 2rem; line-height: 130%; margin-left: 12px;">Memify</span>
+        </div>
       </Col>
       <Col :xs="0" :sm="0" :md="12" :lg="14" :xl="{}" :xxl="{}">
         <ul>
-          <li><a href="#" @click="redirectToHome">Home</a></li>
+          <li><a href="#" @click="redirectToMemes">Browse</a></li>
           <li>
             <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
           </li>
@@ -90,6 +89,9 @@ export default {
   methods: {
     redirectToMemeGenerator() {
       this.$router.push("/memegenerator");
+    },
+    redirectToMemes() {
+      this.$router.push("/memes");
     },
     redirectToHome() {
       this.$router.push("/");

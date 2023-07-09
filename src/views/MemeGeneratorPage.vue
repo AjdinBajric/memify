@@ -94,7 +94,7 @@
             color: #332c5c;
           "
         >
-          Previously created memes
+          Search templates
         </h1>
         <a
           href="#"
@@ -129,7 +129,7 @@
         :xl="{}"
         :xxl="{}"
       >
-        <LandingFooter style="margin-top: 7rem" />
+        <LandingFooter />
       </Col>
     </Row>
   </div>
@@ -189,11 +189,7 @@ export default {
       const isMobile = this.isMobileOrTablet;
       if (isMobile !== this.isMobile) {
         this.isMobile = isMobile;
-        if (isMobile) {
-          this.showSider = false;
-        } else {
-          this.showSider = true;
-        }
+        this.showSider = !isMobile;
       }
     },
   },
