@@ -95,7 +95,10 @@ export default {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-          mode: 'cors',
+        },
+        queryStringParameters: {
+          per_page: 10,
+          page: 1,
         },
       };
 

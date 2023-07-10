@@ -9,6 +9,9 @@ export default {
                 name: "api",
                 endpoint: "https://bnwl9oyg59.execute-api.us-east-1.amazonaws.com",
                 region: "us-east-1",
+                headers: {
+                    "Content-Type": "application/json",
+                }
             },
         ],
     },
