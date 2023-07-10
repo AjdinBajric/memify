@@ -1,17 +1,17 @@
 <template>
   <div class="background">
-    <SignedInHeader />
+    <SignedInHeader/>
     <Row type="flex" justify="space-around" align="middle">
       <Col
-        :xs="{ span: 20 }"
-        :sm="{ span: 20 }"
-        :md="{ span: 20 }"
-        :lg="{ span: 18 }"
-        :xl="{}"
-        :xxl="{}"
+          :xs="{ span: 20 }"
+          :sm="{ span: 20 }"
+          :md="{ span: 20 }"
+          :lg="{ span: 18 }"
+          :xl="{}"
+          :xxl="{}"
       >
         <Layout
-          style="
+            style="
             padding: 24px 0;
             background: #fff;
             min-height: 80vh;
@@ -19,19 +19,19 @@
           "
         >
           <LayoutContent :style="{ padding: '0 24px' }">
-    <h1 class="header-text">Browse popular memes</h1>
+            <h1 class="header-text">Browse popular memes</h1>
             <MemeAnalytics
-              v-show="isAnalyticsVisible"
-              style="margin-bottom: 2rem"
-              :closeAnalyticsFunction="closeAnalytics"
-              id="analytics"
+                v-show="isAnalyticsVisible"
+                style="margin-bottom: 2rem"
+                :closeAnalyticsFunction="closeAnalytics"
+                id="analytics"
             />
-            <MemeCardsGrid :cardsPerRow="3" :showAnalytics="showAnalytics" />
+            <MemeCardsGrid :cardsPerRow="3" :showAnalytics="showAnalytics"/>
             <Pagination
-              current="1"
-              :total="50"
-              show-less-items
-              style="text-align: center; margin-top: 1.5em"
+                current="1"
+                :total="50"
+                show-less-items
+                style="text-align: center; margin-top: 1.5em"
             />
           </LayoutContent>
         </Layout>
@@ -39,14 +39,14 @@
     </Row>
     <Row type="flex" justify="space-around" align="middle">
       <Col
-        :xs="{ span: 18 }"
-        :sm="{ span: 18 }"
-        :md="{ span: 18 }"
-        :lg="{ span: 18 }"
-        :xl="{}"
-        :xxl="{}"
+          :xs="{ span: 18 }"
+          :sm="{ span: 18 }"
+          :md="{ span: 18 }"
+          :lg="{ span: 18 }"
+          :xl="{}"
+          :xxl="{}"
       >
-        <LandingFooter />
+        <LandingFooter/>
       </Col>
     </Row>
   </div>
@@ -58,10 +58,11 @@ import {Col, Layout, LayoutContent, Row, Pagination} from "ant-design-vue";
 import MemeCardsGrid from "@/components/MemeCardsGrid.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
 import MemeAnalytics from "@/components/MemeAnalytics.vue";
+import {API} from "aws-amplify";
 
 export default {
   name: "MemesView",
-   components: {
+  components: {
     SignedInHeader,
     Row,
     Col,
@@ -83,10 +84,39 @@ export default {
   },
   methods: {
     async fetch_memes() {
-      const response = await fetch("https://api.imgflip.com/get_memes");
-      const data = await response.json();
-      this.memes = data.data.memes;
-      console.log(this.memes);
+      // const requestOptions = {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   }
+      // };
+      // const response = await fetch(process.env.VUE_APP_AWS_BE_URL + "/memes", requestOptions);
+      const options = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          mode: 'cors',
+        },
+      };
+
+      API.get('api', '/memes', options)
+          .then(response => {
+            // Handle the API response
+            console.log('API response:', response);
+          })
+          .catch(error => {
+            // Handle errors
+            console.error('API error:', error);
+          });
+
+      // const response = await fetch("https://bnwl9oyg59.execute-api.us-east-1.amazonaws.com/memes", requestOptions)
+      // .then(response => response.text())
+      // .then(result => console.log(result))
+      // .catch(error => console.log('error', error));
+      // console.log(response)
+      // const data = await response.json();
+      // this.memes = data.memes;
+      // console.log(this.memes);
     },
     closeAnalytics() {
       this.isAnalyticsVisible.value = false;
@@ -95,7 +125,7 @@ export default {
       this.isAnalyticsVisible.value = true;
     },
   },
-  async mounted () {
+  async mounted() {
     await this.fetch_memes();
   },
 };
@@ -111,14 +141,14 @@ export default {
 .background {
   background: #d9a7c7; /* fallback for old browsers */
   background: -webkit-linear-gradient(
-    to bottom,
-    #fffeee,
-    #c0b6fc
+      to bottom,
+      #fffeee,
+      #c0b6fc
   ); /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(
-    to bottom,
-    #fffeee,
-    #c0b6fc
+      to bottom,
+      #fffeee,
+      #c0b6fc
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 

@@ -26,7 +26,7 @@
 
 <script>
 import { Row, Col } from "ant-design-vue";
-import MemeCard2 from "./MemeCard2.vue";
+import MemeCard2 from "./MemeCard.vue";
 
 export default {
   name: "MemeCardsGrid",
