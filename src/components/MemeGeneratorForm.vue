@@ -68,15 +68,27 @@
         </FormItem>
       </Spin>
     </Form>
+    <Modal title="Save as Template" @ok="saveTemplate" v-model:visible="modalVisible">
+      <Form layout="vertical">
+        <FormItem label="Name">
+          <Input v-model:value="templateName"/>
+        </FormItem>
+        <FormItem label="Is Public">
+          <Checkbox v-model="isPublic"></Checkbox>
+        </FormItem>
+      </Form>
+    </Modal>
   </div>
 </template>
 
 <script>
-import {Form, Input, FormItem, Button, UploadDragger, Row, Col, Spin} from "ant-design-vue";
+import {Form, Input, FormItem, Button, UploadDragger, Row, Col, Spin, Modal, Checkbox} from "ant-design-vue";
 // import {API, Auth} from 'aws-amplify';
 import MemeEditor from "@/components/MemeEditor.vue";
 import {DeleteOutlined} from "@ant-design/icons-vue";
 import AWS from 'aws-sdk';
+import {API} from "aws-amplify";
+import {Auth} from "@aws-amplify/auth";
 
 export default {
   name: "MemeGeneratorForm",
@@ -91,6 +103,8 @@ export default {
     Row,
     Col,
     Spin,
+    Modal,
+    Checkbox,
   },
   data: function () {
     return {
@@ -98,6 +112,9 @@ export default {
       textFields: [],
       fileList: [],
       loading: false,
+      modalVisible: false,
+      isPublic: true,
+      templateName: '',
     }
   },
   methods: {
@@ -107,6 +124,9 @@ export default {
     },
     deleteTextField(id) {
       this.textFields = this.textFields.filter(textField => textField.id !== id);
+    },
+    handleSubmitTemplate() {
+      console.log(this.templateName, this.isPublic);
     },
     async beforeUpload(file) {
       this.fileList.push(file);
@@ -135,32 +155,33 @@ export default {
         console.error('Error uploading file:', error);
       }
     },
-    async handleSave() {
-      // try {
-      //   const session = await Auth.currentSession();
-      //   const idToken = session.getIdToken().jwtToken;
-      //
-      //   const options = {
-      //     headers: {
-      //       Authorization: `Bearer ${idToken}`,
-      //       Accept: 'application/json',
-      //       'Content-Type': 'application/json',
-      //     },
-      //   };
-      //
-      //   API.get('Memify API', '/example-endpoint', options)
-      //       .then(response => {
-      //         // Handle the API response
-      //         console.log('API response:', response);
-      //       })
-      //       .catch(error => {
-      //         // Handle errors
-      //         console.error('API error:', error);
-      //       });
-      // } catch (error) {
-      //   console.error('Error getting user session:', error);
-      // }
+    handleSave() {
+      this.modalVisible = true;
     },
+    async saveTemplate() {
+      this.modalVisible = false;
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const apiName = 'api';
+      const path = '/templates';
+      const myInit = {
+        body: {
+          name: this.templateName,
+          picture_url: this.url,
+          is_public: this.isPublic,
+        },
+        headers: {
+          Authorization: token,
+        },
+      };
+      API.post(apiName, path, myInit)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error.response);
+          });
+    }
   },
 };
 
