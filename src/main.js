@@ -5,8 +5,13 @@ import router from './router';
 import Antd from 'ant-design-vue';
 import {Amplify} from 'aws-amplify';
 import awsExports from '../aws-exports';
+import AWS from "aws-sdk";
 
 Amplify.configure(awsExports);
+AWS.config.update({
+    accessKeyId: process.env["AWS_ACCESS_KEY_ID"],
+    secretAccessKey: process.env["AWS_SECRET_ACCESS_KEY"],
+});
 
 const app = createApp(App);
 

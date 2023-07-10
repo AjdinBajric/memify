@@ -41,7 +41,7 @@
         </FormItem>
         <Button @click="addTextField" style>Add text field</Button>
       </FormItem>
-      <FormItem  v-if="url">
+      <FormItem v-if="url">
         <Button @click="$refs.memeEditorChild.downloadMeme()" class="custom-button" type="primary"
         >Generate meme
         </Button
@@ -74,6 +74,7 @@ import {Form, Input, FormItem, Button, UploadDragger, Row, Col} from "ant-design
 import {API, Auth} from 'aws-amplify';
 import MemeEditor from "@/components/MemeEditor.vue";
 import {DeleteOutlined} from "@ant-design/icons-vue";
+import AWS from 'aws-sdk';
 
 export default {
   name: "MemeGeneratorForm",
@@ -103,39 +104,31 @@ export default {
     deleteTextField(id) {
       this.textFields = this.textFields.filter(textField => textField.id !== id);
     },
-    beforeUpload(file) {
+    async beforeUpload(file) {
       this.fileList.push(file);
       console.log(this.fileList);
       // Handle file upload
-      // this.url = await this.uploadFileToS3(file);
-      // this.url = 'http://www.gravatar.com/avatar/0c7c99dec43bb0062494520e57f0b9ae?s=256&d=identicon&r=PG';
-      this.url = 'https://imgflip.com/s/meme/Left-Exit-12-Off-Ramp.jpg';
+      this.url = await this.uploadFileToS3(file);
       return false;
     },
-    //   async uploadFileToS3(file) {
-    //   // Initialize AWS with the configuration
-    //   AWS.config.update(this.awsConfig);
-    //
-    //   // Create an S3 instance
-    //   const s3 = new AWS.S3();
-    //
-    //   // Set the upload parameters
-    //   const params = {
-    //     Bucket: this.bucketName,
-    //     Key: this.bucketKey,
-    //     Body: file,
-    //   };
-    //
-    //   // Upload the file to S3
-    //   s3.upload(params, (err, data) => {
-    //     if (err) {
-    //       console.error('Error uploading file:', err);
-    //     } else {
-    //       console.log('File uploaded successfully:', data.Location);
-    //       // Perform any further actions after successful upload
-    //     }
-    //   });
-    // },
+    async uploadFileToS3(file) {
+      const s3 = new AWS.S3();
+
+      const params = {
+        Bucket: 'memify-pictures',
+        Key: file.name,
+        Body: file,
+      };
+
+      try {
+        const data = await s3.upload(params).promise();
+        console.log('File uploaded successfully:', data.Location);
+        return data.Location;
+        // Perform any further actions after successful upload
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    },
     async handleSubmit(e) {
       e.preventDefault();
       // Handle form submission (generate meme)

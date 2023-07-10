@@ -12,6 +12,7 @@
     "ant-design-vue": "^4.0.0-rc.5",
     "antd": "^5.5.2",
     "aws-amplify": "^5.3.3",
+    "aws-sdk": "^2.1413.0",
     "core-js": "^3.8.3",
     "html2canvas": "^1.4.1",
     "vue": "^3.2.13",
