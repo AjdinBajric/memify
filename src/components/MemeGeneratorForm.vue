@@ -3,7 +3,7 @@
     <h1 style="font-family: 'Poppins'">Generate your meme</h1>
     <Form layout="vertical">
       <FormItem>
-        <MemeEditor v-if="url" :url="url" :text='textFields' ref="memeEditorChild"/>
+        <MemeEditor v-if="url || loading" :url="url" :text='textFields' ref="memeEditorChild"/>
         <UploadDragger v-else name="file" :multiple="false" :before-upload="beforeUpload">
           <p class="ant-upload-drag-icon">
             <img src="../assets/uploadPhoto.png" alt="upload image icon"/>
@@ -27,27 +27,28 @@
           </p>
         </UploadDragger>
       </FormItem>
-      <FormItem style="margin-top: 50px;" v-if="url">
-        <FormItem v-for="text in textFields" :key="text.id" :label="`Text ${text.id}`" style="margin: 8px 0;">
-          <Row type="flex" align="middle">
-            <Col span="20">
-              <Input v-model:value="text.value"/>
-            </Col>
-            <Col span="4">
-              <DeleteOutlined @click="deleteTextField(text.id)"
-                              style="margin-left: 10px; color: red; font-size: 14px;"/>
-            </Col>
-          </Row>
+      <Spin :spinning="loading" style="margin-top: 50px;" tip="Loading..">
+        <FormItem style="margin-top: 50px;" v-if="url || loading">
+          <FormItem v-for="text in textFields" :key="text.id" :label="`Text ${text.id}`" style="margin: 8px 0;">
+            <Row type="flex" align="middle">
+              <Col span="20">
+                <Input v-model:value="text.value"/>
+              </Col>
+              <Col span="4">
+                <DeleteOutlined @click="deleteTextField(text.id)"
+                                style="margin-left: 10px; color: red; font-size: 14px;"/>
+              </Col>
+            </Row>
+          </FormItem>
+          <Button @click="addTextField" style>Add text field</Button>
         </FormItem>
-        <Button @click="addTextField" style>Add text field</Button>
-      </FormItem>
-      <FormItem v-if="url">
-        <Button @click="$refs.memeEditorChild.downloadMeme()" class="custom-button" type="primary"
-        >Generate meme
-        </Button
-        >
-        <Button class="outlined-button" @click="handleSave">Save as template</Button>
-        <span style="float: right">
+        <FormItem v-if="loading || url">
+          <Button @click="$refs.memeEditorChild.downloadMeme()" class="custom-button" type="primary"
+          >Generate meme
+          </Button
+          >
+          <Button class="outlined-button" @click="handleSave">Save as template</Button>
+          <span style="float: right">
           <img
               src="../assets/twitter.png"
               alt="twittterimg"
@@ -64,14 +65,15 @@
               class="social-media-icons"
           />
         </span>
-      </FormItem>
+        </FormItem>
+      </Spin>
     </Form>
   </div>
 </template>
 
 <script>
-import {Form, Input, FormItem, Button, UploadDragger, Row, Col} from "ant-design-vue";
-import {API, Auth} from 'aws-amplify';
+import {Form, Input, FormItem, Button, UploadDragger, Row, Col, Spin} from "ant-design-vue";
+// import {API, Auth} from 'aws-amplify';
 import MemeEditor from "@/components/MemeEditor.vue";
 import {DeleteOutlined} from "@ant-design/icons-vue";
 import AWS from 'aws-sdk';
@@ -88,12 +90,14 @@ export default {
     DeleteOutlined,
     Row,
     Col,
+    Spin,
   },
   data: function () {
     return {
       url: null,
       textFields: [],
       fileList: [],
+      loading: false,
     }
   },
   methods: {
@@ -107,8 +111,10 @@ export default {
     async beforeUpload(file) {
       this.fileList.push(file);
       console.log(this.fileList);
+      this.loading = true;
       // Handle file upload
       this.url = await this.uploadFileToS3(file);
+      this.loading = false;
       return false;
     },
     async uploadFileToS3(file) {
@@ -129,35 +135,31 @@ export default {
         console.error('Error uploading file:', error);
       }
     },
-    async handleSubmit(e) {
-      e.preventDefault();
-      // Handle form submission (generate meme)
-    },
     async handleSave() {
-      try {
-        const session = await Auth.currentSession();
-        const idToken = session.getIdToken().jwtToken;
-
-        const options = {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        };
-
-        API.get('Memify API', '/example-endpoint', options)
-            .then(response => {
-              // Handle the API response
-              console.log('API response:', response);
-            })
-            .catch(error => {
-              // Handle errors
-              console.error('API error:', error);
-            });
-      } catch (error) {
-        console.error('Error getting user session:', error);
-      }
+      // try {
+      //   const session = await Auth.currentSession();
+      //   const idToken = session.getIdToken().jwtToken;
+      //
+      //   const options = {
+      //     headers: {
+      //       Authorization: `Bearer ${idToken}`,
+      //       Accept: 'application/json',
+      //       'Content-Type': 'application/json',
+      //     },
+      //   };
+      //
+      //   API.get('Memify API', '/example-endpoint', options)
+      //       .then(response => {
+      //         // Handle the API response
+      //         console.log('API response:', response);
+      //       })
+      //       .catch(error => {
+      //         // Handle errors
+      //         console.error('API error:', error);
+      //       });
+      // } catch (error) {
+      //   console.error('Error getting user session:', error);
+      // }
     },
   },
 };
