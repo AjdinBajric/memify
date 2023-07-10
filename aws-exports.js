@@ -6,8 +6,8 @@ export default {
     API: {
         endpoints: [
             {
-                name: "Memify API",
-                endpoint: "https://mq3nqrrt4l.execute-api.us-east-1.amazonaws.com/firstversion",
+                name: "get-all-memes",
+                endpoint: "https://bnwl9oyg59.execute-api.us-east-1.amazonaws.com/memes",
                 region: "us-east-1",
             },
         ],
