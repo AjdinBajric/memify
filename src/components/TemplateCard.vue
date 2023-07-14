@@ -1,7 +1,7 @@
 <template>
-  <div class="meme-card" @click="showAnalytics">
+  <div class="meme-card" @click="selectTemplate">
     <div class="image-container">
-      <img class="meme-image" :src="imageUrl" alt="Meme"/>
+      <img class="meme-image" :src="imageUrl" alt="Template"/>
     </div>
     <div class="content-container">
       <div class="header-container">
@@ -12,26 +12,42 @@
         </div>
       </div>
       <div class="details">
-        <div class="likes">
-          <img class="icon" src="../assets/heart.svg" alt="Likes"/>
-          <span class="likes-text">{{ likesCount }} likes</span>
-        </div>
         <div class="views">
           <img class="icon" src="../assets/eye.svg" alt="Views"/>
-          <span class="views-text">{{ viewsCount }} views</span>
+          <span class="views-text">{{ isPublic ? 'Public' : 'Private' }}</span>
         </div>
-        <div class="daily-uses">
-          <img class="icon" src="../assets/download.svg" alt="Downloads"/>
-          <span class="shares-text">{{ shareCount }} downloads</span>
+        <div class="views" @click.stop="selectSettings">
+          <img class="icon" src="../assets/settings.svg" alt="Settings" style="width: 20px; height: auto"/>
         </div>
       </div>
     </div>
+    <Modal title="Upload meme" @ok="saveSettings" v-model:visible="modalVisible">
+      <Form layout="vertical">
+        <FormItem label="Name">
+          <Input v-model:value="templateName" style="padding: 4px 11px"/>
+          <div style="display: flex">
+            <p>Set to private:</p>
+            <Checkbox v-model:checked="isPrivate" style="margin-left: 8px;"></Checkbox>
+          </div>
+        </FormItem>
+      </Form>
+    </Modal>
   </div>
 </template>
 
 <script>
+import {Form, Input, FormItem, Modal, Checkbox} from "ant-design-vue";
+import {Auth} from "@aws-amplify/auth";
+import {API} from "aws-amplify";
 export default {
-  name: "MemeCard",
+  name: "TemplateCard",
+  components: {
+    Form,
+    Input,
+    FormItem,
+    Modal,
+    Checkbox,
+  },
   props: {
     imageUrl: {
       type: String,
@@ -49,18 +65,17 @@ export default {
       type: String,
       required: false,
     },
-    likesCount: {
-      type: Number,
+    isPublic: {
+      type: Boolean,
       required: true,
     },
-    viewsCount: {
-      type: Number,
-      required: true,
-    },
-    shareCount: {
-      type: Number,
-      required: true,
-    },
+  },
+  data() {
+    return {
+      modalVisible: false,
+      templateName: this.title,
+      isPrivate: !this.isPublic,
+    }
   },
   computed: {
     formattedDate() {
@@ -73,8 +88,36 @@ export default {
     },
   },
   methods: {
-    showAnalytics() {
-      this.$emit("showAnalytics", this.id);
+    async saveSettings() {
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const options = {
+        body: {
+          name: this.templateName,
+          is_public: !this.isPrivate,
+        },
+        headers: {
+          Authorization: token,
+        },
+      };
+      API.patch('api', `/templates/${this.id}`, options)
+          .then(response => {
+            console.log(response);
+            this.isUploading = false;
+            this.modalVisible = false;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      this.modalVisible = false;
+    },
+    selectTemplate() {
+      this.$emit("selectTemplate", this.id);
+    },
+    selectSettings() {
+      // this.templateName = this.title;
+      // this.isPrivate = !this.isPublic;
+      this.modalVisible = true;
     }
   }
 };
@@ -131,7 +174,7 @@ export default {
 
 .details {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   margin-top: 1.5rem;
 }
 

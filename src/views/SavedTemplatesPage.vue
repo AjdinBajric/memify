@@ -3,9 +3,9 @@
     <SignedInHeader/>
     <Row type="flex" justify="space-around" align="middle">
       <Col
-          :xs="{ span: 18 }"
-          :sm="{ span: 18 }"
-          :md="{ span: 18 }"
+          :xs="{ span: 20 }"
+          :sm="{ span: 20 }"
+          :md="{ span: 20 }"
           :lg="{ span: 18 }"
           :xl="{}"
           :xxl="{}"
@@ -41,10 +41,9 @@
                 >
                   <div style="display: flex; align-items: center; margin-bottom: 4px;">
                     <img
-                        src="../assets/picture-color.svg"
+                        src="../assets/picture-black.svg"
                         alt="img1"
                         style="width:24px; height:auto;"
-
                     />
                     <p>Generator</p>
                   </div>
@@ -52,7 +51,7 @@
                 <MenuItem class="menu-item" style="display: flex;" @click="redirectToSavedTemplates">
                   <div style="display: flex; align-items: center; margin-bottom: 4px;">
                     <img
-                        src="../assets/save-black.svg"
+                        src="../assets/save-color.svg"
                         alt="img2"
                         style="width:28px; height:auto; margin-left: -4px;"
                     />
@@ -63,57 +62,10 @@
             </div>
           </LayoutSider>
           <LayoutContent :style="{ padding: '0 24px' }">
-            <MemeGeneratorForm :template_url="selectedTemplateUrl"/>
+            <h1 style="font-family: 'Poppins'">Saved Templates</h1>
+            <MemeCardsGrid :memes="templates" :cardsPerRow="3" @showAnalytics="openTemplate"/>
           </LayoutContent>
         </Layout>
-      </Col>
-    </Row>
-    <Row
-        type="flex"
-        justify="space-around"
-        align="middle"
-        style="margin: 4rem 0 2rem"
-    >
-      <Col
-          :xs="{ span: 18 }"
-          :sm="{ span: 18 }"
-          :md="{ span: 18 }"
-          :lg="{ span: 18 }"
-          :xl="{}"
-          :xxl="{}"
-      >
-        <h1
-            style="
-            display: inline;
-            margin-right: 1rem;
-            font-family: 'Poppins';
-            font-weight: 600;
-            font-size: 20px;
-            line-height: 20px;
-            color: #332c5c;
-          "
-        >
-          Search templates
-        </h1>
-      </Col>
-    </Row>
-    <Row type="flex" justify="space-around" align="middle">
-      <Col
-          :xs="{ span: 18 }"
-          :sm="{ span: 18 }"
-          :md="{ span: 18 }"
-          :lg="{ span: 18 }"
-          :xl="{}"
-          :xxl="{}"
-      >
-        <MemeCardsGrid :memes="templates" @showAnalytics="selectTemplate" CardsPerRow="4"/>
-        <Pagination
-            v-model:current="currentPage"
-            :total="50"
-            @change="onChangePage"
-            show-less-items
-            style="text-align: center; margin-top: 1.5em"
-        />
       </Col>
     </Row>
     <Row type="flex" justify="space-around" align="middle">
@@ -135,8 +87,8 @@
 import SignedInHeader from "@/components/SignedInHeader.vue";
 import MemeCardsGrid from "@/components/MemeCardsGrid.vue";
 import LandingFooter from "@/components/LandingFooter.vue";
-import MemeGeneratorForm from "@/components/MemeGeneratorForm.vue";
-import {useRouter} from "vue-router";
+// import MemeAnalytics from "@/components/MemeAnalytics.vue";
+
 import {
   Row,
   Col,
@@ -145,12 +97,14 @@ import {
   MenuItem,
   LayoutSider,
   LayoutContent,
-  Pagination
+  // Pagination,
 } from "ant-design-vue";
 import {API} from "aws-amplify";
+import {Auth} from "@aws-amplify/auth";
+
 
 export default {
-  name: "MemeGeneratorPage",
+  name: "SavedTemplatesPage",
   components: {
     SignedInHeader,
     Row,
@@ -160,18 +114,18 @@ export default {
     MenuItem,
     LayoutSider,
     LayoutContent,
-    MemeGeneratorForm,
     MemeCardsGrid,
     LandingFooter,
-    Pagination
+    // MemeAnalytics,
+    // Pagination,
   },
   data() {
     return {
-      currentPage: 1,
-      templates: [],
+      current: 1,
       showSider: true,
+      showAnalyticsComponent: false,
       isMobile: false,
-      selectedTemplateUrl: null,
+      templates: [],
     };
   },
   computed: {
@@ -179,29 +133,46 @@ export default {
       return window.innerWidth <= 768; // Adjust the breakpoint as needed
     },
   },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  },
   methods: {
-    onChangePage() {
-      this.fetch_templates();
-    },
     async fetch_templates() {
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+
       const options = {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          Authorization: token,
         },
         queryStringParameters: {
-          per_page: 6,
-          page: this.currentPage,
+          per_page: 10,
+          page: 1,
         },
       };
 
-      const data = await API.get('api', '/templates', options)
+      const data = await API.get('api', '/templates/get-my', options)
       this.templates = data.templates;
     },
-
-    selectTemplate(templateId) {
-      const selectedTemplate = this.templates.find(meme => meme.template_id === templateId);
-      if (selectedTemplate) this.selectedTemplateUrl = selectedTemplate.image_url;
+    openTemplate(templateId) {
+      const selectedTemplate = this.templates.find(
+          (template) => template.template_id === templateId
+      );
+      this.$router.push({
+        name: "MemeGenerator",
+        query: {templateUrl: selectedTemplate.image_url},
+      });
+    },
+    redirectToMemeGenerator() {
+      this.$router.push("/memegenerator");
+    },
+    redirectToSavedTemplates() {
+      this.$router.push("/savedtemplates")
+    },
+    redirectToHome() {
+      this.$router.push("/")
     },
     handleResize() {
       const isMobile = this.isMobileOrTablet;
@@ -212,35 +183,12 @@ export default {
     },
   },
   async mounted() {
-    this.selectedTemplateUrl = this.$route.query.templateUrl || null;
-
     await this.fetch_templates();
     this.isMobile = this.isMobileOrTablet;
     window.addEventListener("resize", this.handleResize);
   },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  },
-  setup() {
-    const router = useRouter();
+}
 
-    const redirectToMemeGenerator = () => {
-      router.push("/memegenerator");
-    };
-    const redirectToSavedTemplates = () => {
-      router.push("/savedtemplates");
-    };
-    const redirectToHome = () => {
-      router.push("/");
-    };
-
-    return {
-      redirectToMemeGenerator,
-      redirectToSavedTemplates,
-      redirectToHome,
-    };
-  },
-};
 </script>
 
 <style scoped>
@@ -255,7 +203,6 @@ export default {
   align-items: center;
   margin-bottom: 12px;
   cursor: pointer;
-  font-family: "Poppins";
 }
 
 .sidebar .menu-item img {

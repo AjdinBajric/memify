@@ -9,7 +9,7 @@
           :lg="{ span: 6 }"
           :xl="{}"
           :xxl="{}"
-          style="display: flex; flex; justify-content: space-between;"
+          style="display: flex; flex-direction: column; justify-content: space-between;"
       >
         <div>
           <div style="display: flex; align-items: center; cursor: pointer;">
@@ -25,7 +25,7 @@
             padding-right: 2rem;
           "
           >
-            The place to find memes on the internet!
+            The best place to find memes on the internet!
           </p>
         </div>
         <div>
@@ -33,17 +33,17 @@
             <img
                 src="../assets/facebook.png"
                 alt="spotify"
-                style="width: 2rem; margin-right: 1rem"
+                style="width: 2rem; opacity: 40%; margin-right: 2.5rem"
             />
             <img
                 src="../assets/instagram.png"
                 alt="insta"
-                style="width: 2rem; opacity: 40%; margin-right: 1rem"
+                style="width: 2rem; opacity: 40%; margin-right: 2.5rem"
             />
             <img
                 src="../assets/twitter.png"
                 alt="youtube"
-                style="width: 2rem; opacity: 40%; margin-right: 1rem"
+                style="width: 2rem; opacity: 40%; margin-right: 2.5rem"
             />
           </span>
         </div>

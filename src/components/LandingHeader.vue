@@ -27,7 +27,7 @@
           <li>
             <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
           </li>
-          <li><a href="#">Contact us</a></li>
+<!--          <li><a href="#">Contact us</a></li>-->
           <li style="display: inline-block">
             <Button
               type="primary"
@@ -36,7 +36,7 @@
               >Login</Button
             >
           </li>
-          <li style="display: inline-block">
+          <li style="display: inline-block; padding-left: 1rem;">
             <Button
               type="default"
               class="outlined-button"
@@ -130,9 +130,9 @@ ul {
 }
 
 .custom-button {
-  float: "left";
   color: white;
   background-color: var(--primary-color-2);
+  border-radius: 5px;
 }
 
 .custom-button:hover {
