@@ -108,6 +108,7 @@
       >
         <MemeCardsGrid :memes="templates" @showAnalytics="selectTemplate" CardsPerRow="2"/>
         <Pagination
+            v-model:pageSize="pageSize"
             v-model:current="currentPage"
             :total="total"
             @change="onChangePage"
