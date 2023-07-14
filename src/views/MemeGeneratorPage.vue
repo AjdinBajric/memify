@@ -112,7 +112,7 @@
             :total="total"
             @change="onChangePage"
             show-less-items
-            style="text-align: center; margin-top: 1.5em"
+            style="text-align: center; margin-top: 1.51em"
         />
       </Col>
     </Row>
