@@ -11,7 +11,7 @@
           <span class="date-text">{{ formattedDate }}</span>
         </div>
       </div>
-      <div class="details">
+      <div class="details" v-if="isSavedTemplatesPage">
         <div class="views">
           <img class="icon" src="../assets/eye.svg" alt="Views"/>
           <span class="views-text">{{ isPublic ? 'Public' : 'Private' }}</span>
@@ -39,6 +39,8 @@
 import {Form, Input, FormItem, Modal, Checkbox} from "ant-design-vue";
 import {Auth} from "@aws-amplify/auth";
 import {API} from "aws-amplify";
+import { notification } from 'ant-design-vue';
+
 export default {
   name: "TemplateCard",
   components: {
@@ -78,6 +80,10 @@ export default {
     }
   },
   computed: {
+    isSavedTemplatesPage() {
+      console.log(this.$route.name)
+      return this.$route.name === 'Saved Templates';
+    },
     formattedDate() {
       const date = new Date(this.date);
 
@@ -103,11 +109,21 @@ export default {
       API.patch('api', `/templates/${this.id}`, options)
           .then(response => {
             console.log(response);
+            notification.success({
+              message: "Saved settings",
+              description: "Changes have been saved.",
+            });
+
             this.isUploading = false;
             this.modalVisible = false;
+
           })
           .catch(error => {
             console.log(error);
+            notification.success({
+              message: "Something went wrong",
+              description: "Please try again later.",
+            })
           });
       this.modalVisible = false;
     },

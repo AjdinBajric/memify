@@ -169,7 +169,7 @@ export default {
     return {
       currentPage: 1,
       total: 0,
-      pageSize: 2,
+      pageSize: 6,
       templates: [],
       showSider: true,
       isMobile: false,

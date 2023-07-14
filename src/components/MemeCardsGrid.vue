@@ -14,7 +14,7 @@
           v-if="meme.template_id"
           :id="meme.template_id"
           :title="meme.name"
-          :date="meme.date_created"
+          :date="meme.date_created || meme.date_uploaded"
           :isPublic="meme.is_public"
           :imageUrl="meme.image_url"
           @selectTemplate="showAnalytics"
