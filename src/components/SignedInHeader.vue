@@ -108,7 +108,7 @@ export default {
         });
 
         // Redirect to login page after logout
-        this.$router.push("/login");
+        this.$router.push("/");
       } catch (error) {
         // Notify user of error
         notification.error({

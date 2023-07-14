@@ -36,7 +36,7 @@
               >Login</Button
             >
           </li>
-          <li style="display: inline-block; padding-left: 1rem;">
+          <li style="display: inline-block; padding-left: 0.7rem;">
             <Button
               type="default"
               class="outlined-button"

@@ -159,7 +159,7 @@ export default {
 
         // Redirect to a confirmation page or show a success message
         localStorage.setItem('email', this.email);
-        this.$router.push('/login');
+        this.$router.push('/verify');
       } catch (error) {
         // Handle signup error
         console.log('Signup error:', error);

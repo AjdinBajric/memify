@@ -70,7 +70,7 @@ router.beforeEach(async (to, from, next) => {
         if (authRequired) {
             // User is not authenticated and trying to access a private route
             shouldProceed = false;
-            next('/login'); // Redirect to the login page
+            next('/'); // Redirect to the login page
         }
     }
 

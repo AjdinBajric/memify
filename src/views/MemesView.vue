@@ -30,7 +30,7 @@
             <MemeCardsGrid :memes="memes" :cardsPerRow="3" @showAnalytics="showAnalytics"/>
             <Pagination
                 v-model:current="currentPage"
-                :total="50"
+                :total="total"
                 @change="onChangePage"
                 show-less-items
                 style="text-align: center; margin-top: 1.5em"
@@ -83,6 +83,7 @@ export default {
       memes: [],
       memeToShow: null,
       currentPage: 1,
+      total: 50,
     }
   },
   methods: {
