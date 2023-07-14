@@ -1,24 +1,49 @@
 <template>
   <div id="box">
     <img class="meme-image" :src="url">
-    <p v-for="text in text" :key="text.id" class="meme-text"> {{ text.value }} </p>
+    <p v-for="textField in textFields" :key="textField.id" class="meme-text"
+       :style="getStyles(textField.id)"> {{ textField.value }} </p>
   </div>
+
+  <Modal title="Upload meme" @ok="uploadMeme" v-model:visible="modalVisible">
+    <Form layout="vertical">
+      <FormItem label="Name">
+        <Input v-model:value="memeName" style="padding: 4px 11px"/>
+        <Spin :spinning="isUploading" tip="Uploading.."/>
+      </FormItem>
+    </Form>
+  </Modal>
 </template>
 
 <script>
 import html2canvas from "html2canvas";
+import AWS from "aws-sdk";
+import {API, Auth} from "aws-amplify";
+import {Spin, Form, Modal, FormItem, Input} from "ant-design-vue";
 
 export default {
   name: "MemeEditor",
-  props: {url: String, text: Array},
-  components: {},
+  props: {url: String, textFields: Array, styles: Object},
+  components: {Spin, Modal, Form, FormItem, Input},
   data() {
     return {
       dragObj: {},
       draggables: [],
+      loading: false,
+      uploadMemeUrl: "",
+      modalVisible: false,
+      memeName: "",
+      isUploading: false,
     }
   },
   methods: {
+    getStyles(id) {
+      const textField = this.textFields.find(text => text.id === id);
+      return {
+        'max-width': textField.maxWidth + "px",
+        'font-size': textField.fontSize + "px",
+      }
+    },
     down(event) {
       if (~event.target.className.search(/meme-text/)) {
         this.dragObj = this.makeObj(event);
@@ -26,7 +51,6 @@ export default {
         document.addEventListener("mousemove", this.freeMovement, false);
       }
     },
-
     freeMovement(event) {
       //Prevents redundantly adding the same event handler repeatedly
       if (typeof (this.dragObj.element.mouseup) == "undefined")
@@ -63,17 +87,70 @@ export default {
 
       return obj;
     },
-    downloadMeme() {
+    saveMeme() {
+      this.modalVisible = true;
+    },
+    uploadMeme() {
+      this.isUploading = true;
       html2canvas(document.getElementById("box"), {
         useCORS: true
-      }).then(function (canvas) {
-        const anchorTag = document.createElement("a");
-        document.body.appendChild(anchorTag);
-        anchorTag.download = "meme.jpg";
-        anchorTag.href = canvas.toDataURL();
-        anchorTag.target = '_blank';
-        anchorTag.click();
+      }).then((canvas) => {
+        // const anchorTag = document.createElement("a");
+        // document.body.appendChild(anchorTag);
+        // anchorTag.download = "meme.jpg";
+        // anchorTag.href = canvas.toDataURL();
+        // anchorTag.target = '_blank';
+        // anchorTag.click();
+        canvas.toBlob(async (blob) => {
+          // Create a File object from the Blob
+          const session = await Auth.currentSession();
+          const idToken = session.getIdToken().decodePayload().sub;
+          const file = new File([blob], `${idToken}-${Date.now()}.jpg`);
+          this.uploadMemeUrl = await this.uploadFileToS3(file);
+
+          const user = await Auth.currentAuthenticatedUser();
+          const token = user.signInUserSession.idToken.jwtToken;
+          const options = {
+            headers: {
+              Authorization: token,
+            },
+            body: {
+              name: this.memeName || "Untitled",
+              picture_url: this.uploadMemeUrl,
+            },
+          };
+          API.post('api', '/memes', options)
+              .then(response => {
+                console.log(response);
+                this.isUploading = false;
+                this.modalVisible = false;
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          // send request to memes endpoint to save meme
+
+          this.loading = false;
+        }, "image/jpeg");
       });
+    },
+    async uploadFileToS3(file) {
+      const s3 = new AWS.S3();
+
+      const params = {
+        Bucket: 'memify-pictures',
+        Key: file.name,
+        Body: file,
+      };
+
+      try {
+        const data = await s3.upload(params).promise();
+        console.log('File uploaded successfully:', data.Location);
+        return data.Location;
+        // Perform any further actions after successful upload
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     },
     updateDraggableElements() {
       const draggables = document.getElementsByClassName("meme-text");

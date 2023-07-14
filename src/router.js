@@ -4,7 +4,7 @@ import LandingPage from './views/LandingPage'
 import LoginPage from './views/LoginPage';
 import SignupPage from './views/SignupPage';
 import MemeGeneratorPage from './views/MemeGeneratorPage';
-import SavedMemesPage from './views/SavedMemesPage';
+import SavedTemplatesPage from './views/SavedTemplatesPage.vue';
 import VerificationPage from "@/views/VerificationPage.vue";
 import {Auth} from "@aws-amplify/auth";
 import MemesView from "@/views/MemesView.vue";
@@ -37,13 +37,13 @@ const routes = [
     },
     {
         path: '/memegenerator',
-        name: 'Meme Generator',
+        name: 'MemeGenerator',
         component: MemeGeneratorPage
     },
     {
-        path: '/savedmemes',
-        name: 'Saved Memes',
-        component: SavedMemesPage
+        path: '/savedtemplates',
+        name: 'Saved Templates',
+        component: SavedTemplatesPage
     },
 ];
 
@@ -53,7 +53,7 @@ const router = createRouter({
 });
 //before each router check if user is logged in
 router.beforeEach(async (to, from, next) => {
-    const publicPages = ['/login', '/signup', '/verify'];
+    const publicPages = ['/', '/login', '/signup', '/verify'];
     const authRequired = !publicPages.includes(to.path);
     let shouldProceed = true; // Flag to track if the callback should be called
 

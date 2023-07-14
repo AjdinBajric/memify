@@ -20,7 +20,7 @@
           <li>
             <a href="#" @click="redirectToMemeGenerator">Generate meme</a>
           </li>
-          <li><a href="#">Contact us</a></li>
+<!--          <li><a href="#">Contact us</a></li>-->
           <li style="display: inline-block">
             <a class="avatar-dropdown" @click="toggleDropdown">
               <Avatar alt="profile picture" style="background-color: purple">

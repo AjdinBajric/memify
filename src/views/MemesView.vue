@@ -21,15 +21,17 @@
           <LayoutContent :style="{ padding: '0 24px' }">
             <h1 class="header-text">Browse popular memes</h1>
             <MemeAnalytics
-                v-show="isAnalyticsVisible"
+                v-if="memeToShow"
+                :meme="memeToShow"
                 style="margin-bottom: 2rem"
-                :closeAnalyticsFunction="closeAnalytics"
+                @closeAnalytics="closeAnalytics"
                 id="analytics"
             />
-            <MemeCardsGrid :cardsPerRow="3" :showAnalytics="showAnalytics"/>
+            <MemeCardsGrid :memes="memes" :cardsPerRow="3" @showAnalytics="showAnalytics"/>
             <Pagination
-                current="1"
+                v-model:current="currentPage"
                 :total="50"
+                @change="onChangePage"
                 show-less-items
                 style="text-align: center; margin-top: 1.5em"
             />
@@ -79,53 +81,34 @@ export default {
   data() {
     return {
       memes: [],
-      isAnalyticsVisible: false,
+      memeToShow: null,
+      currentPage: 1,
     }
   },
   methods: {
+    onChangePage() {
+      this.fetch_memes();
+    },
     async fetch_memes() {
-      // const requestOptions = {
-      //   method: "GET",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   }
-      // };
-      // const response = await fetch(process.env.VUE_APP_AWS_BE_URL + "/memes", requestOptions);
       const options = {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         queryStringParameters: {
-          per_page: 10,
-          page: 1,
+          per_page: 9,
+          page: this.currentPage,
         },
       };
 
-      API.get('api', '/memes', options)
-          .then(response => {
-            // Handle the API response
-            console.log('API response:', response);
-          })
-          .catch(error => {
-            // Handle errors
-            console.error('API error:', error);
-          });
-
-      // const response = await fetch("https://bnwl9oyg59.execute-api.us-east-1.amazonaws.com/memes", requestOptions)
-      // .then(response => response.text())
-      // .then(result => console.log(result))
-      // .catch(error => console.log('error', error));
-      // console.log(response)
-      // const data = await response.json();
-      // this.memes = data.memes;
-      // console.log(this.memes);
+      const data = await API.get('api', '/memes', options)
+      this.memes = data.memes;
     },
     closeAnalytics() {
-      this.isAnalyticsVisible.value = false;
+      this.memeToShow = null;
     },
-    showAnalytics() {
-      this.isAnalyticsVisible.value = true;
+    showAnalytics(memeId) {
+      this.memeToShow = this.memes.find(meme => meme.meme_id === memeId);
     },
   },
   async mounted() {

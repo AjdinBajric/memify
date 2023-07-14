@@ -3,7 +3,7 @@
     <h1 style="font-family: 'Poppins'">Generate your meme</h1>
     <Form layout="vertical">
       <FormItem>
-        <MemeEditor v-if="url || loading" :url="url" :text='textFields' ref="memeEditorChild"/>
+        <MemeEditor v-if="url" :url="url" :textFields='textFields' ref="memeEditorChild"/>
         <UploadDragger v-else name="file" :multiple="false" :before-upload="beforeUpload">
           <p class="ant-upload-drag-icon">
             <img src="../assets/uploadPhoto.png" alt="upload image icon"/>
@@ -26,29 +26,38 @@
             PNG,
           </p>
         </UploadDragger>
+        <Spin :spinning="loading" tip="Loading.."/>
       </FormItem>
-      <Spin :spinning="loading" style="margin-top: 50px;" tip="Loading..">
-        <FormItem style="margin-top: 50px;" v-if="url || loading">
-          <FormItem v-for="text in textFields" :key="text.id" :label="`Text ${text.id}`" style="margin: 8px 0;">
-            <Row type="flex" align="middle">
-              <Col span="20">
-                <Input v-model:value="text.value"/>
+      <FormItem style="margin-top: 50px;" v-if="url">
+        <FormItem v-for="text in textFields" :key="text.id" :label="`Text ${text.id}`" style="margin: 8px 0;">
+          <Row :gutter="16" type="flex" align="middle">
+            <Col span="12">
+              <Input v-model:value="text.value"/>
+            </Col>
+            <Col span="6">
+              <AInputNumber style="width: 100%" addon-before="Box size" min="24" default-value="200"
+                            v-model:value="text.maxWidth" step="20"/>
+            </Col>
+            <Row span="4" :gutter="8">
+              <Col span="12">
+                <Button @click="increaseTextSize(text.id)">+</Button>
               </Col>
-              <Col span="4">
-                <DeleteOutlined @click="deleteTextField(text.id)"
-                                style="margin-left: 10px; color: red; font-size: 14px;"/>
+              <Col span="12">
+                <Button @click="decreaseTextSize(text.id)">-</Button>
               </Col>
             </Row>
-          </FormItem>
-          <Button @click="addTextField" style>Add text field</Button>
+            <Col span="2">
+              <DeleteOutlined @click="deleteTextField(text.id)"
+                              style="margin-left: 10px; color: red; font-size: 18px;"/>
+            </Col>
+          </Row>
         </FormItem>
-        <FormItem v-if="loading || url">
-          <Button @click="$refs.memeEditorChild.downloadMeme()" class="custom-button" type="primary"
-          >Generate meme
-          </Button
-          >
-          <Button class="outlined-button" @click="handleSave">Save as template</Button>
-          <span style="float: right">
+        <Button @click="addTextField" style>Add text field</Button>
+      </FormItem>
+      <FormItem v-if="url">
+        <Button @click="$refs.memeEditorChild.saveMeme()" class="custom-button" type="primary">Generate meme</Button>
+        <Button class="outlined-button" @click="handleSave">Save as template</Button>
+        <span style="float: right">
           <img
               src="../assets/twitter.png"
               alt="twittterimg"
@@ -65,24 +74,25 @@
               class="social-media-icons"
           />
         </span>
-        </FormItem>
-      </Spin>
+      </FormItem>
     </Form>
     <Modal title="Save as Template" @ok="saveTemplate" v-model:visible="modalVisible">
       <Form layout="vertical">
         <FormItem label="Name">
           <Input v-model:value="templateName"/>
+          <div style="display: flex">
+            <p>Set to private:</p>
+            <Checkbox v-model:checked="isPrivate" style="margin-left: 8px;"></Checkbox>
+          </div>
         </FormItem>
-        <FormItem label="Is Public">
-          <Checkbox v-model="isPublic"></Checkbox>
-        </FormItem>
+        <Spin :spinning="isUploading" tip="Uploading.."/>
       </Form>
     </Modal>
   </div>
 </template>
 
 <script>
-import {Form, Input, FormItem, Button, UploadDragger, Row, Col, Spin, Modal, Checkbox} from "ant-design-vue";
+import {Form, Input, FormItem, Button, UploadDragger, Row, Spin, Col, Modal, Checkbox} from "ant-design-vue";
 // import {API, Auth} from 'aws-amplify';
 import MemeEditor from "@/components/MemeEditor.vue";
 import {DeleteOutlined} from "@ant-design/icons-vue";
@@ -102,47 +112,76 @@ export default {
     DeleteOutlined,
     Row,
     Col,
-    Spin,
     Modal,
     Checkbox,
+    Spin,
+  },
+  props: {
+    template_url: {
+      type: String,
+      default: null,
+    },
   },
   data: function () {
     return {
-      url: null,
+      url: this.template_url,
       textFields: [],
       fileList: [],
-      loading: false,
       modalVisible: false,
-      isPublic: true,
+      isPrivate: false,
       templateName: '',
+      isUploading: false,
+      loading: false,
+    }
+  },
+  watch: {
+    template_url: function (newVal) {
+      this.url = newVal;
     }
   },
   methods: {
+    increaseTextSize(id) {
+      const textFieldIdx = this.findTextFieldIdx(id);
+      const fontSize = +(this.textFields[textFieldIdx].fontSize || 34);
+      this.textFields[textFieldIdx].fontSize = fontSize + 4;
+    },
+    decreaseTextSize(id) {
+      const textFieldIdx = this.findTextFieldIdx(id);
+      let newFontSize = +(this.textFields[textFieldIdx].fontSize || 34) - 4;
+      newFontSize = newFontSize < 16 ? 16 : newFontSize;
+      this.textFields[textFieldIdx].fontSize = newFontSize;
+    },
+    findTextFieldIdx(id) {
+      return this.textFields.findIndex(textField => textField.id === id);
+    },
     addTextField() {
       const textFieldId = Math.max(...this.textFields.map(t => t.id), 0) + 1;
-      this.textFields.push({id: textFieldId, 'value': 'Text ' + textFieldId});
+      this.textFields.push({id: textFieldId, 'value': 'Text ' + textFieldId, 'fontSize': 34, 'maxWidth': 200});
     },
     deleteTextField(id) {
       this.textFields = this.textFields.filter(textField => textField.id !== id);
     },
-    handleSubmitTemplate() {
-      console.log(this.templateName, this.isPublic);
-    },
     async beforeUpload(file) {
       this.fileList.push(file);
-      console.log(this.fileList);
       this.loading = true;
       // Handle file upload
       this.url = await this.uploadFileToS3(file);
       this.loading = false;
       return false;
     },
+    handleSave() {
+      this.modalVisible = true;
+    },
     async uploadFileToS3(file) {
       const s3 = new AWS.S3();
 
+      const session = await Auth.currentSession();
+      const idToken = session.getIdToken().decodePayload().sub;
+      const fileName = `${idToken}-${Date.now()}.jpg`;
+
       const params = {
         Bucket: 'memify-pictures',
-        Key: file.name,
+        Key: fileName,
         Body: file,
       };
 
@@ -150,36 +189,32 @@ export default {
         const data = await s3.upload(params).promise();
         console.log('File uploaded successfully:', data.Location);
         return data.Location;
-        // Perform any further actions after successful upload
       } catch (error) {
         console.error('Error uploading file:', error);
       }
     },
-    handleSave() {
-      this.modalVisible = true;
-    },
     async saveTemplate() {
-      this.modalVisible = false;
+      this.isUploading = true;
       const user = await Auth.currentAuthenticatedUser();
       const token = user.signInUserSession.idToken.jwtToken;
-      const apiName = 'api';
-      const path = '/templates';
       const myInit = {
         body: {
           name: this.templateName,
           picture_url: this.url,
-          is_public: this.isPublic,
+          is_public: !this.isPrivate,
         },
         headers: {
           Authorization: token,
         },
       };
-      API.post(apiName, path, myInit)
+      API.post('api', '/templates', myInit)
           .then(response => {
             console.log(response);
+            this.isUploading = false;
+            this.modalVisible = false;
           })
           .catch(error => {
-            console.log(error.response);
+            console.log(error);
           });
     }
   },
