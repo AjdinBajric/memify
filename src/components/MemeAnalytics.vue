@@ -64,6 +64,7 @@
 <script>
 import {Row, Col, Statistic, Card, Button} from "ant-design-vue";
 import {CloseOutlined, DownloadOutlined, HeartOutlined, HeartTwoTone} from "@ant-design/icons-vue";
+import {API, Auth} from "aws-amplify";
 // import {API, Auth} from "aws-amplify";
 
 export default {
@@ -125,84 +126,81 @@ export default {
       // this.closeAnalyticsFunction();
     },
     async addViewCount() {
-      // const user = await Auth.currentAuthenticatedUser();
-      // const token = user.signInUserSession.idToken.jwtToken;
-      // const options = {
-      //   headers: {
-      //     Authorization: token,
-      //   },
-      //   body: {
-      //     // name: this.memeName || "Untitled",
-      //     // picture_url: this.uploadMemeUrl,
-      //   },
-      // };
-      // API.post('api', `/memes/${this.meme.meme_id}`, options)
-      //     .then(response => {
-      //       console.log(response);
-      //     })
-      //     .catch(error => {
-      //       console.log(error);
-      //     });
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const options = {
+        headers: {
+          Authorization: token,
+        },
+        body: {
+          meme_id: this.meme.meme_id,
+        },
+      };
+      API.post('api', `/views`, options)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     async addDownloadCount() {
-      // const user = await Auth.currentAuthenticatedUser();
-      // const token = user.signInUserSession.idToken.jwtToken;
-      // const options = {
-      //   headers: {
-      //     Authorization: token,
-      //   },
-      //   body: {
-      //     // name: this.memeName || "Untitled",
-      //     // picture_url: this.uploadMemeUrl,
-      //   },
-      // };
-      // API.post('api', `/memes/${this.meme.meme_id}`, options)
-      //     .then(response => {
-      //       console.log(response);
-      //     })
-      //     .catch(error => {
-      //       console.log(error);
-      //     });
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const options = {
+        headers: {
+          Authorization: token,
+        },
+        body: {
+          meme_id: this.meme.meme_id
+        },
+      };
+      API.post('api', `/shares`, options)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     async addLikeCount() {
-      // const user = await Auth.currentAuthenticatedUser();
-      // const token = user.signInUserSession.idToken.jwtToken;
-      // const options = {
-      //   headers: {
-      //     Authorization: token,
-      //   },
-      //   body: {
-      //     // name: this.memeName || "Untitled",
-      //     // picture_url: this.uploadMemeUrl,
-      //   },
-      // };
-      // API.post('api', `/memes/${this.meme.meme_id}`, options)
-      //     .then(response => {
-      //       console.log(response);
-      //     })
-      //     .catch(error => {
-      //       console.log(error);
-      //     });
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const options = {
+        headers: {
+          Authorization: token,
+        },
+        body: {
+          "meme_id": this.meme.meme_id,
+        },
+      };
+      API.post('api', `/likes`, options)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     async removeLikeCount() {
-      // const user = await Auth.currentAuthenticatedUser();
-      // const token = user.signInUserSession.idToken.jwtToken;
-      // const options = {
-      //   headers: {
-      //     Authorization: token,
-      //   },
-      //   body: {
-      //     // name: this.memeName || "Untitled",
-      //     // picture_url: this.uploadMemeUrl,
-      //   },
-      // };
-      // API.post('api', `/memes/${this.meme.meme_id}`, options)
-      //     .then(response => {
-      //       console.log(response);
-      //     })
-      //     .catch(error => {
-      //       console.log(error);
-      //     });
+      const user = await Auth.currentAuthenticatedUser();
+      const token = user.signInUserSession.idToken.jwtToken;
+      const options = {
+        headers: {
+          Authorization: token,
+        },
+        body: {
+          // name: this.memeName || "Untitled",
+          // picture_url: this.uploadMemeUrl,
+        },
+      };
+      API.post('api', `/likes/${this.meme.meme_id}`, options)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     downloadMeme() {
       this.hasDownloaded = true;

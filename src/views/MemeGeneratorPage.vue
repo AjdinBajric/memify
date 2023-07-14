@@ -106,7 +106,7 @@
           :xl="{}"
           :xxl="{}"
       >
-        <MemeCardsGrid :memes="templates" @showAnalytics="selectTemplate" CardsPerRow="4"/>
+        <MemeCardsGrid :memes="templates" @showAnalytics="selectTemplate" CardsPerRow="2"/>
         <Pagination
             v-model:current="currentPage"
             :total="total"
@@ -168,7 +168,8 @@ export default {
   data() {
     return {
       currentPage: 1,
-      total: 50,
+      total: 0,
+      pageSize: 2,
       templates: [],
       showSider: true,
       isMobile: false,
@@ -181,7 +182,8 @@ export default {
     },
   },
   methods: {
-    onChangePage() {
+    onChangePage(currentPage) {
+      this.currentPage = currentPage;
       this.fetch_templates();
     },
     async fetch_templates() {
@@ -191,13 +193,14 @@ export default {
           'Content-Type': 'application/json',
         },
         queryStringParameters: {
-          per_page: 6,
+          per_page: this.pageSize,
           page: this.currentPage,
         },
       };
 
       const data = await API.get('api', '/templates', options)
       this.templates = data.templates;
+      this.total = data.total;
     },
 
     selectTemplate(templateId) {

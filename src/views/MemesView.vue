@@ -19,7 +19,7 @@
           "
         >
           <LayoutContent :style="{ padding: '0 24px' }">
-            <h1 class="header-text">Browse popular memes</h1>
+            <h2 class="header-text">Browse popular memes</h2>
             <MemeAnalytics
                 v-if="memeToShow"
                 :meme="memeToShow"
@@ -82,12 +82,14 @@ export default {
     return {
       memes: [],
       memeToShow: null,
+      total: 0,
       currentPage: 1,
-      total: 50,
+      pageSize: 9,
     }
   },
   methods: {
-    onChangePage() {
+    onChangePage(currentPage) {
+      this.currentPage = currentPage;
       this.fetch_memes();
     },
     async fetch_memes() {
@@ -97,13 +99,14 @@ export default {
           'Content-Type': 'application/json',
         },
         queryStringParameters: {
-          per_page: 9,
+          per_page: this.pageSize,
           page: this.currentPage,
         },
       };
 
       const data = await API.get('api', '/memes', options)
       this.memes = data.memes;
+      this.total = data.total;
     },
     closeAnalytics() {
       this.memeToShow = null;
@@ -152,7 +155,7 @@ export default {
 }
 
 .header-text {
-  font-size: 32px;
+  font-size: 28px;
   margin-left: 16px;
   margin-bottom: 16px;
   font-weight: 500;
